@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <ul id="message">
+    	<input type="text" id="text"/>
+    	<input type="button" value="sub" onclick="sub()"/>
+    	<p>receive: <span id="receive"></span></p>
+    </ul>
+    <script>
+        socket = io.connect('ws://127.0.0.1:3000');
+        function sub(){
+        	let msg = document.getElementById("text").value;
+        	socket.emit("message", msg);
+        }
+        socket.on("message", function(obj) {
+        	document.getElementById("receive").innerHTML  = obj;
+        });
+    </script>
+</body>
+</html>
