@@ -3,7 +3,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.get('/', function(req, res){
-    res.send('<h1>Welcome Realtime Server</h1>');
+    res.send('<a href="file:///F:/web/homeGit/webSocket/web/index.html?">Enjoy joke</a>');
 });
 
 io.on('connection', function(socket){
@@ -11,8 +11,9 @@ io.on('connection', function(socket){
     socket.on("disconnect", function() {
         console.log("a user go out");
     });
-    socket.on("message", function(obj) {
-        io.emit("message", obj);
+    socket.on("data", function(obj) {
+      console.log(obj);
+        io.emit("data", obj);
     });
 });
 

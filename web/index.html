@@ -3,23 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+    <style media="screen">
+      body{
+        width:100%;
+        height: 100%;
+      }
+      .sub_button{
+        color: #fff;
+        background: #308ee3;
+        border-radius: 4px;
+        padding: 0 12px;
+        height: 30px;
+        border: 0 none;
+        cursor: pointer;
+      }
+      .dialogBg{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        htight: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1;
+      }
+      .dialog{
+        width: 30%;
+        min-width:300px;
+        height: 200px;
+        border: 5px double #eee;
+        border-radius: 10px;
+        margin: 0 auto;
+        background: #fff;
+      }
+      .dialog h4{
+        margin-top: 0;
+        padding: 10px;
+        text-align: center;
+      }
+    </style>
 </head>
 <body>
-    <ul id="message">
-    	<input type="text" id="text"/>
-    	<input type="button" value="sub" onclick="sub()"/>
-    	<p>receive: <span id="receive"></span></p>
-    </ul>
-    <script>
-        socket = io.connect('ws://127.0.0.1:3000');
-        function sub(){
-        	let msg = document.getElementById("text").value;
-        	socket.emit("message", msg);
-        }
-        socket.on("message", function(obj) {
-        	document.getElementById("receive").innerHTML  = obj;
-        });
-    </script>
+  <div class="">
+    <h2>笑话</h2>
+    <div class="receive">
+
+    </div>
+    <div class="">
+      <textarea id="text" rows="8" cols="80"></textarea><br>
+      <input type="button" value="提交" onclick="sub()" class="sub_button"/>
+    </div>
+  </div>
+  <div class="dialogBg">
+      <div class="dialog">
+        <h4 class="bg-primary">登录</h4>
+        <div class="">
+          <form class="form-horizontal" >
+            <div class="form-group">
+              <label for="userName" class="col-sm-3 control-label">用户名：</label>
+              <div class="col-sm-9">
+                <input class="form-control" name="userName" id="userName" placeholder="用户名" value="">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-4 col-sm-5">
+                <button type="button" class="btn btn-primary" onclick="login()">Sign in</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+  </div>
 </body>
+<script>
+    socket = io.connect('ws://127.0.0.1:3000');
+    function sub(){
+      let msg = document.getElementById("text").value;
+      if(!msg.trim()){
+        alert('请输入内容')
+        return
+      }
+      if(!sessionStorage.getItem('userName')){
+        $(".dialogBg").css('display','block');
+        return
+      }
+      let data={
+        msg:msg,
+        user:sessionStorage.getItem('userName')
+      }
+      socket.emit("message",data);
+    }
+    function login() {
+      let userName=$("input[name='userName']").val();
+      if(!userName.trim()){
+        alert('请输入用户名')
+        return
+      }
+      sessionStorage.setItem('userName',userName);
+      $(".dialogBg").css('display','none');
+    }
+    socket.on("message", function(obj) {
+      $(".receive").append('<p>'+obj.user+': <span id="receive">'+ obj.msg+'</span></p>');
+      document.getElementById("text").value='';
+    });
+</script>
 </html>
